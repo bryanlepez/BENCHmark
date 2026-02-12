@@ -1,0 +1,105 @@
+## Deep Research Request: Lifter-Friendly Macro Tracker (Web MVP)
+
+<context>
+I’m building a modern, fast calorie + macro tracking web app for gym lifters.
+
+**My skills:** Some Python + Java; beginner with frameworks. I can read/understand code and am willing to learn React.
+**Goal:** A usable MVP in 2 weeks.
+**Budget:** Under $50/month.
+**Differentiation:** Speed + clean UI + accurate food search + lifter-friendly experience.
+**Competitor impressions:** 
+- MyFitnessPal: strong database/accuracy/options but clunky UI
+- Cronometer: better UI but weaker food search
+</context>
+
+<instructions>
+### Research Objectives
+Help me choose a practical, modern, scalable approach to build a web MVP quickly (2 weeks) with:
+- Fast food lookup + autocomplete
+- Add/edit/remove items in a daily log
+- Auto-calc daily macro totals
+- Store daily logs historically and allow editing past days
+- Large, accurate searchable food database
+- Auth/accounts + cloud sync
+- Decide offline-first vs online-first
+
+### Core Questions to Answer (be concrete)
+1. **Food database options (most important):**
+   - Compare: USDA FoodData Central, Open Food Facts, Nutritionix, Edamam, FatSecret, Spoonacular, etc.
+   - Which options are best for:
+     - Search quality + breadth
+     - Data accuracy (especially branded vs generic foods)
+     - Barcode support (now or later)
+     - Pricing that can fit under $50/month at MVP scale
+   - Provide a recommended “MVP choice” + a “scale-up choice”.
+   - Include current rate limits/pricing and any key restrictions.
+
+2. **Search UX + performance:**
+   - Best-practice patterns for instant search/autocomplete (debounce, caching, prefix matching, ranking).
+   - Suggested approach for:
+     - API-backed search (typeahead)
+     - Handling duplicates/variants (same food entries)
+     - Favorites / recent foods to speed logging
+   - Clear guidance for keeping the UI fast on mobile browsers.
+
+3. **Data model for daily logs (editable history):**
+   - Recommend a schema for:
+     - Users
+     - Foods (cached references vs raw snapshots)
+     - Log entries (with grams/servings, timestamps)
+     - Daily totals (computed vs stored)
+   - How to support editing past days safely, and prevent “food data changed” issues:
+     - Should log entries store a snapshot of macros at time of logging?
+     - How to handle recipe/serving changes?
+   - Include example tables/collections and relationships.
+
+4. **Auth + cloud sync:**
+   - Compare Supabase vs Firebase vs “roll your own” for a React web app MVP.
+   - Recommend the fastest-to-ship option that is still scalable.
+   - Include security basics (RLS policies if Supabase, rules if Firebase).
+
+5. **Offline-first vs online-first:**
+   - For a 2-week MVP: recommend online-first with small offline enhancements OR true offline-first.
+   - If offline support is recommended:
+     - What’s the simplest approach (service worker, local storage/IndexedDB, sync queue)?
+     - What are the main pitfalls?
+
+6. **Recommended stack for my skill level (modern + scalable):**
+   - Provide 2 stack options:
+     - **MVP-fast option** (optimize for shipping in 2 weeks)
+     - **Modern-scalable option** (best long-term structure)
+   - For each: frontend, backend, database, auth, hosting, and food API integration.
+   - Include a short architecture diagram (Mermaid or text).
+
+7. **MVP scope + 2-week build plan:**
+   - Define “must-have” vs “nice-to-have” (barcode scanning likely later).
+   - Provide a day-by-day or week-by-week plan with deliverables.
+   - Provide “definition of done” checks aligned to success metrics:
+     - Log food quickly
+     - Auto-calc daily macros
+     - Large searchable foods
+
+### Required Deliverables
+1. **Competitor + Data Source Table**
+   - Food data source, features (branded/generic/barcode), pricing, rate limits, pros/cons, best use case.
+
+2. **Architecture Recommendation**
+   - MVP-fast and modern-scalable stacks with pros/cons + estimated complexity.
+
+3. **Data Model**
+   - Suggested schema (SQL tables or NoSQL collections) + rationale.
+
+4. **Search UX Plan**
+   - Autocomplete approach, ranking, caching, performance tactics.
+
+5. **2-Week MVP Roadmap**
+   - A practical implementation plan with clear milestones.
+
+### Output Format Requirements
+- Use tables for comparisons.
+- Provide clear recommendations (not just options).
+- Include source URLs with access dates for:
+  - Pricing, rate limits, API terms
+  - Key technical guidance
+- Explicitly note any uncertainty or disagreements between sources.
+</instructions>
