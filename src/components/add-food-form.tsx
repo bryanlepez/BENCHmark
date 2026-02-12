@@ -26,25 +26,70 @@ export function AddFoodForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const [measureMode, setMeasureMode] = useState<"serving" | "g" | "oz">("serving");
+
+  const isGramBased = selected?.serving_unit.toLowerCase() === "g";
+
+  const macrosPerUnit = useMemo(() => {
+    if (!selected) {
+      return null;
+    }
+
+    if (measureMode === "serving") {
+      return {
+        calories: selected.calories,
+        protein: selected.protein_g,
+        carbs: selected.carbs_g,
+        fat: selected.fat_g,
+        unitLabel: `${selected.serving_size}${selected.serving_unit}`
+      };
+    }
+
+    const servingSize = selected.serving_size > 0 ? selected.serving_size : 1;
+    const caloriesPerGram = selected.calories / servingSize;
+    const proteinPerGram = selected.protein_g / servingSize;
+    const carbsPerGram = selected.carbs_g / servingSize;
+    const fatPerGram = selected.fat_g / servingSize;
+
+    if (measureMode === "g") {
+      return {
+        calories: caloriesPerGram,
+        protein: proteinPerGram,
+        carbs: carbsPerGram,
+        fat: fatPerGram,
+        unitLabel: "1g"
+      };
+    }
+
+    const gramsPerOz = 28.3495;
+    return {
+      calories: caloriesPerGram * gramsPerOz,
+      protein: proteinPerGram * gramsPerOz,
+      carbs: carbsPerGram * gramsPerOz,
+      fat: fatPerGram * gramsPerOz,
+      unitLabel: "1oz"
+    };
+  }, [measureMode, selected]);
 
   const scaled = useMemo(() => {
-    if (!selected) {
+    if (!macrosPerUnit) {
       return null;
     }
 
     const qty = Number(quantity) || 0;
 
     return {
-      calories: (selected.calories * qty).toFixed(1),
-      protein: (selected.protein_g * qty).toFixed(1),
-      carbs: (selected.carbs_g * qty).toFixed(1),
-      fat: (selected.fat_g * qty).toFixed(1)
+      calories: (macrosPerUnit.calories * qty).toFixed(1),
+      protein: (macrosPerUnit.protein * qty).toFixed(1),
+      carbs: (macrosPerUnit.carbs * qty).toFixed(1),
+      fat: (macrosPerUnit.fat * qty).toFixed(1)
     };
-  }, [quantity, selected]);
+  }, [macrosPerUnit, quantity]);
 
   async function handleSearch(nextQuery: string) {
     setQuery(nextQuery);
     setSelected(null);
+    setMeasureMode("serving");
     setError(null);
     setInfo(null);
 
@@ -85,11 +130,11 @@ export function AddFoodForm() {
           foodName: selected.name,
           brand: selected.brand,
           quantity: Number(quantity),
-          unit: selected.serving_unit,
-          calories: selected.calories,
-          proteinG: selected.protein_g,
-          carbsG: selected.carbs_g,
-          fatG: selected.fat_g
+          unit: measureMode === "serving" ? `serving (${selected.serving_size}${selected.serving_unit})` : measureMode,
+          calories: macrosPerUnit?.calories ?? selected.calories,
+          proteinG: macrosPerUnit?.protein ?? selected.protein_g,
+          carbsG: macrosPerUnit?.carbs ?? selected.carbs_g,
+          fatG: macrosPerUnit?.fat ?? selected.fat_g
         })
       });
 
@@ -102,6 +147,7 @@ export function AddFoodForm() {
       setResults([]);
       setSelected(null);
       setQuantity("1");
+      setMeasureMode("serving");
       pushToast("Entry added.");
       router.refresh();
     } catch (caught) {
@@ -135,6 +181,7 @@ export function AddFoodForm() {
                 className="flex w-full items-center justify-between border-b border-line px-3 py-2 text-left last:border-b-0 hover:bg-base"
                 onClick={() => {
                   setSelected(item);
+                  setMeasureMode("serving");
                 }}
               >
                 <span>
@@ -154,16 +201,33 @@ export function AddFoodForm() {
         <div className="space-y-3 rounded border border-line p-3">
           <p className="text-sm font-medium">Selected: {selected.name}</p>
           <label className="block text-sm">
-            Quantity
-            <input
-              type="number"
-              min="0.1"
-              step="0.1"
-              value={quantity}
-              onChange={(event) => setQuantity(event.target.value)}
-              className="mt-1 w-full rounded border border-line px-2 py-1"
-            />
+            Amount
+            <div className="mt-1 grid grid-cols-[1fr_120px] gap-2">
+              <input
+                type="number"
+                min="0.1"
+                step="0.1"
+                value={quantity}
+                onChange={(event) => setQuantity(event.target.value)}
+                className="w-full rounded border border-line px-2 py-1"
+              />
+              <select
+                value={measureMode}
+                onChange={(event) => setMeasureMode(event.target.value as "serving" | "g" | "oz")}
+                className="rounded border border-line bg-white px-2 py-1 text-sm"
+              >
+                <option value="serving">Serving</option>
+                {isGramBased ? <option value="g">g</option> : null}
+                {isGramBased ? <option value="oz">oz</option> : null}
+              </select>
+            </div>
           </label>
+          {macrosPerUnit ? (
+            <p className="text-xs text-gray-700">
+              Per {macrosPerUnit.unitLabel}: {macrosPerUnit.calories.toFixed(1)} kcal | P{" "}
+              {macrosPerUnit.protein.toFixed(1)}g | C {macrosPerUnit.carbs.toFixed(1)}g | F {macrosPerUnit.fat.toFixed(1)}g
+            </p>
+          ) : null}
           {scaled && (
             <p className="text-sm">
               {scaled.calories} kcal | P {scaled.protein}g | C {scaled.carbs}g | F {scaled.fat}g

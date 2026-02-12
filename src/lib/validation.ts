@@ -10,7 +10,7 @@ export const goalSchema = z.object({
 export const addEntrySchema = z.object({
   foodName: z.string().min(1).max(120),
   brand: z.string().max(120).nullable().optional(),
-  quantity: z.coerce.number().min(0.1).max(20),
+  quantity: z.coerce.number().min(0.1).max(10000),
   unit: z.string().min(1).max(32),
   calories: z.coerce.number().min(0).max(5000),
   proteinG: z.coerce.number().min(0).max(500),
